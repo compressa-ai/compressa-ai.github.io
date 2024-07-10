@@ -1,7 +1,5 @@
 openapi: 3.1.0
 info:
-  description: |
-    Test
   version: 1.0.0
   title: Compressa API
 servers:
