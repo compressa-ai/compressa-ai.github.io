@@ -4,22 +4,23 @@ info:
     Test
   version: 1.0.0
   title: Compressa API
-  contact:
-    name: API Support
-    email: apiteam@swagger.io
-    url: https://github.com/Redocly/redoc
 servers:
   - url: https://compressa-api.mil-team.ru
     description: Default server
 tags:
   - name: chat
-    description: Chat API
+    description: >
+      Compressa Chat API is OpenAI compatible API that allows you to create chat
+      completions.
     x-displayName: Chat API
   - name: embeddings
-    description: Text Embeddings API
+    description: >
+      Compressa Embeddings API is OpenAI compatible API that allows you to
+      create embeddings.
     x-displayName: Text Embeddings API
   - name: rerank
-    description: Rerank API
+    description: |
+      Compressa Rerank API allows you to rerank documents based on a query.
     x-displayName: Rerank API
 paths:
   /v1/chat/completions:
