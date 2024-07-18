@@ -59,7 +59,7 @@ paths:
                 "Content-Type": "application/json"
               },
               json={
-                "model": "/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct",
+                "model": "Compressa-LLM",
                 "messages": [
                   {
                     "role": "system",
@@ -86,7 +86,7 @@ paths:
               -H 'accept: application/json' \
               -H 'Content-Type: application/json' \
               -d '{
-              "model": "/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct",
+              "model": "Compressa-LLM",
               "messages": [
                       {
                           "role": "system",
@@ -139,7 +139,7 @@ paths:
                 "Content-Type": "application/json"
               },
               json={
-                "model": "/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct",
+                "model": "Compressa-LLM",
                 "prompt": "Who won the world series in 2020?"
               }
             )
@@ -154,7 +154,7 @@ paths:
               -H 'accept: application/json' \
               -H 'Content-Type: application/json' \
               -d '{
-                "model": "/app/resources/models/models/compressa-ai_Llama-3-8B-Instruct",
+                "model": "Compressa-LLM",
                 "prompt": "Who won the world series in 2020?"
               }'
   /v1/embeddings:
@@ -195,7 +195,7 @@ paths:
                 "Content-Type": "application/json"
               },
               json={
-                "model": "/app/resources/models/models/Salesforce_SFR-Embedding-Mistral",
+                "model": "Compressa-Embedding",
                 "input": "string"
               }
             )
@@ -210,7 +210,7 @@ paths:
               -H 'Authorization: Bearer TOKEN' \
               -H 'Content-Type: application/json' \
               -d '{
-                  "model": "/app/resources/models/models/Salesforce_SFR-Embedding-Mistral",
+                  "model": "Compressa-Embedding",
                   "input": "string"
               }'
   /v1/models:
@@ -277,7 +277,7 @@ paths:
                 "Content-Type": "application/json"
               },
               json={
-                "model": "mixedbread-ai/mxbai-rerank-large-v1",
+                "model": "Compressa-ReRank",
                 "query": "Query?",
                 "documents": [
                   "document 1",
@@ -298,7 +298,7 @@ paths:
               -H "accept: application/json" \
               -H "Content-Type: application/json" \
               -d '{
-                "model": "mixedbread-ai/mxbai-rerank-large-v1",
+                "model": "Compressa-ReRank",
                 "query": "Query?",
                 "documents": [
                   "document 1",
