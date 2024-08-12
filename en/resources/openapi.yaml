@@ -15,7 +15,7 @@ info:
 
 servers:
   - url: https://compressa-api.mil-team.ru
-    description: Default server
+    description: Compressa API Server
 
 # info:
 #   description: |
@@ -36,6 +36,11 @@ tags:
     description: |
       Compressa Rerank API allows you to rerank documents based on a query.
     x-displayName: Rerank API
+
+  - name: layout
+    description: |
+      Compressa Layout API allows you to partion documents.
+    x-displayName: Layout API
 
 paths:
   /v1/chat/completions:
@@ -336,6 +341,80 @@ paths:
                 ],
                 "return_documents": false
               }'
+
+  /v1/layout:
+    post:
+      tags:
+        - layout
+      summary: Summary
+      description: Description
+      operationId: partition_parameters
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_partition_parameters'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Element'
+                title: Response Partition Parameters
+                type: array
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-speakeasy-name-override: partition
+      x-codeSamples:
+        - lang: Python
+          label: Python
+          source: |
+            import requests
+
+            url = "https://compressa-api.mil-team.ru/v1/layout"
+            headers = {
+                "Authorization": "Bearer TOKEN",
+                "accept": "application/json",
+            }
+
+            files = {"files": open("path/to/file.pdf", "rb")}
+            data = {
+                "xml_keep_tags": "false",
+                "output_format": "application/json",
+                "coordinates": "true",
+                "strategy": "auto",
+                "languages": ["rus", "eng"]
+            }
+
+            response = requests.post(
+                url,
+                headers=headers,
+                files=files,
+                data=data
+            )
+
+            print(response.json())
+
+        - lang: curl
+          label: cURL
+          source: |
+            curl -X POST "https://compressa-api.mil-team.ru/v1/layout" \
+              -H "Authorization: Bearer TOKEN" \
+              -H "accept: application/json" \
+              -F "files=@path/to/file.pdf" \
+              -F "xml_keep_tags=false" \
+              -F "output_format=application/json" \
+              -F "coordinates=true" \
+              -F "strategy=auto" \
+              -F "languages[]=rus" \
+              -F "languages[]=eng"
 
 components:
   schemas:
@@ -1398,3 +1477,245 @@ components:
           anyOf:
           - {}
           - {}
+
+    Body_partition_parameters:
+      properties:
+        files:
+          type: string
+          format: binary
+          description: The file to extract
+          required: 'true'
+          examples:
+            - summary: File to be partitioned
+              externalValue: >-
+                https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf
+        xml_keep_tags:
+          type: boolean
+          title: Xml Keep Tags
+          description: >-
+            If True, will retain the XML tags in the output. Otherwise it will
+            simply extract the text from within the tags. Only applies to
+            partition_xml.
+          default: false
+        languages:
+          items:
+            type: string
+          type: array
+          title: OCR Languages
+          description: >-
+            The languages present in the document, for use in partitioning
+            and/or OCR
+          default: []
+        ocr_languages:
+          items:
+            type: string
+          type: array
+          title: OCR Languages
+          description: >-
+            The languages present in the document, for use in partitioning
+            and/or OCR
+          default: []
+        skip_infer_table_types:
+          items:
+            type: string
+          type: array
+          title: Skip Infer Table Types
+          description: >-
+            The document types that you want to skip table extraction with.
+            Default: []
+          default: []
+        gz_uncompressed_content_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Uncompressed Content Type
+          description: If file is gzipped, use this content type after unzipping
+        output_format:
+          type: string
+          enum:
+            - application/json
+            - text/csv
+          title: Output Format
+          description: >-
+            The format of the response. Supported formats are application/json
+            and text/csv. Default: application/json.
+          default: application/json
+        coordinates:
+          type: boolean
+          title: Coordinates
+          description: 'If true, return coordinates for each element. Default: false'
+          default: false
+        content_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Content type
+          description: >-
+            A hint about the content type to use (such as text/markdown), when
+            there are problems processing a specific file. This value is a MIME
+            type in the format type/subtype.
+        encoding:
+          type: string
+          title: Encoding
+          description: 'The encoding method used to decode the text input. Default: utf-8'
+          default: utf-8
+        hi_res_model_name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Hi Res Model Name
+          description: The name of the inference model used when strategy is hi_res
+        include_page_breaks:
+          type: boolean
+          title: Include Page Breaks
+          description: >-
+            If True, the output will include page breaks if the filetype
+            supports it. Default: false
+          default: false
+        pdf_infer_table_structure:
+          type: boolean
+          title: Pdf Infer Table Structure
+          description: >-
+            Deprecated! Use skip_infer_table_types to opt out of table
+            extraction for any file type. If False and strategy=hi_res, no Table
+            Elements will be extracted from pdf files regardless of
+            skip_infer_table_types contents.
+          default: true
+        strategy:
+          type: string
+          enum:
+            - fast
+            - hi_res
+            - auto
+            - ocr_only
+          title: Strategy
+          description: >-
+            The strategy to use for partitioning PDF/image. Options are fast,
+            hi_res, auto. Default: auto
+          default: auto
+          examples:
+            - auto
+            - hi_res
+        extract_image_block_types:
+          items:
+            type: string
+          type: array
+          title: Image block types to extract
+          description: >-
+            The types of elements to extract, for use in extracting image blocks
+            as base64 encoded data stored in metadata fields
+          default: []
+        unique_element_ids:
+          type: boolean
+          title: unique_element_ids
+          description: >-
+            When `True`, assign UUIDs to element IDs, which guarantees their
+            uniqueness 
+
+            (useful when using them as primary keys in database). Otherwise a
+            SHA-256 of element text is used. Default: False
+          default: false
+        chunking_strategy:
+          anyOf:
+            - type: string
+              enum:
+                - by_title
+              const: by_title
+            - type: 'null'
+          title: Chunking Strategy
+          description: >-
+            Use one of the supported strategies to chunk the returned elements.
+            Currently supports: by_title
+          examples:
+            - by_title
+        combine_under_n_chars:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Combine Under N Chars
+          description: >-
+            If chunking strategy is set, combine elements until a section
+            reaches a length of n chars. Default: 500
+        max_characters:
+          type: integer
+          title: Max Characters
+          description: >-
+            If chunking strategy is set, cut off new sections after reaching a
+            length of n chars (hard max). Default: 1500
+          default: 500
+        multipage_sections:
+          type: boolean
+          title: Multipage Sections
+          description: >-
+            If chunking strategy is set, determines if sections can span
+            multiple sections. Default: true
+          default: true
+        new_after_n_chars:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: New after n chars
+          description: >-
+            If chunking strategy is set, cut off new sections after reaching a
+            length of n chars (soft max). Default: 1500
+        overlap:
+          type: integer
+          title: Overlap
+          description: >-
+            Specifies the length of a string ("tail") to be drawn from each
+            chunk and prefixed to the
+
+            next chunk as a context-preserving mechanism. By default, this only
+            applies to split-chunks
+
+            where an oversized element is divided into multiple chunks by
+            text-splitting. Default: 0
+          default: 0
+        overlap_all:
+          type: boolean
+          title: Overlap all
+          description: >-
+            When `True`, apply overlap between "normal" chunks formed from whole
+
+            elements and not subject to text-splitting. Use this with caution as
+            it entails a certain
+
+            level of "pollution" of otherwise clean semantic chunk boundaries.
+            Default: False
+          default: false
+        starting_page_number:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: PDF Starting Page Number
+          description: >-
+            When PDF is split into pages before sending it into the API,
+            providing this information will allow the page number to be assigned
+            correctly.
+      type: object
+      required:
+        - files
+      title: Body_partition_parameters
+    Element:
+      properties:
+        type:
+          type: string
+          title: Type
+        element_id:
+          type: string
+          title: Element Id
+        metadata:
+          type: object
+          title: Metadata
+        text:
+          type: string
+          title: Text
+      type: object
+      required:
+        - type
+        - element_id
+        - metadata
+        - text
+      title: Element
+
+
