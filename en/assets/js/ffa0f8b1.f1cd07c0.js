@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcompressa_docs=self.webpackChunkcompressa_docs||[]).push([[681],{2152:s=>{s.exports=JSON.parse('{"name":"docusaurus-plugin-redoc","id":"api"}')}}]);
